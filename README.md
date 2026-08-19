@@ -4,6 +4,9 @@
 > Goals: Python 3 compatibility, updated dependencies, security fixes.
 > License: AGPLv3 (unchanged from original)
 
+[![Python 3](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-blue.svg)](https://github.com/maksimtech/Mailpile/actions)
+[![CI](https://github.com/maksimtech/Mailpile/actions/workflows/test.yml/badge.svg)](https://github.com/maksimtech/Mailpile/actions/workflows/test.yml)
+
 ---
 
 # Welcome to Mailpile! #
