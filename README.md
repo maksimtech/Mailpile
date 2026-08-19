@@ -1,3 +1,11 @@
+> [!NOTE]
+> **This is an actively maintained fork** of the original [mailpile/Mailpile](https://github.com/mailpile/Mailpile) project.
+> Maintained by [@maksimtech](https://github.com/maksimtech).
+> Goals: Python 3 compatibility, updated dependencies, security fixes.
+> License: AGPLv3 (unchanged from original)
+
+---
+
 # Welcome to Mailpile! #
 
 **IMPORTANT NOTE**
