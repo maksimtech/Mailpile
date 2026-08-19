@@ -104,6 +104,8 @@ class GnuPGEventUpdater:
         self._log_public('Sent passphrase')
 
     def _parse_gpg_line(self, line):
+        if isinstance(line, bytes):
+            line = line.decode('utf-8', errors='replace')
         if line.startswith('[GNUPG:] '):
             pass  # FIXME: Parse for machine-readable data
         elif line.startswith('gpg: '):
@@ -410,7 +412,7 @@ class GnuPGRecordParser:
         pass
 
 
-UID_PARSE_RE = "^([^\(\<]+?){0,1}( \((.+?)\)){0,1}( \<(.+?)\>){0,1}\s*$"
+UID_PARSE_RE = r"^([^\(\<]+?){0,1}( \((.+?)\)){0,1}( \<(.+?)\>){0,1}\s*$"
 
 
 def stubborn_decode(text):
@@ -608,7 +610,7 @@ class GnuPG:
         """Returns a tuple representing the GnuPG version number."""
         global GPG_VERSIONS
         if update or not GPG_VERSIONS.get(self.gpgbinary):
-            match = re.search( "(\d+).(\d+).(\d+)", self.version() )
+            match = re.search( r"(\d+).(\d+).(\d+)", self.version() )
             version = tuple(int(v) for v in match.groups())
             GPG_VERSIONS[self.gpgbinary] = version
         return GPG_VERSIONS[self.gpgbinary]
