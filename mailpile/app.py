@@ -23,6 +23,12 @@ from mailpile.plugins.setup_magic import Setup
 from mailpile.ui import ANSIColors, Session, UserInteraction, Completer
 from mailpile.util import *
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 _plugins = PluginManager(builtin=__file__)
 
 # This makes sure mailbox "plugins" get loaded... has to go somewhere?
@@ -50,7 +56,7 @@ def threaded_raw_input(prompt):
     t = threading.Thread(target=reader, args=(o,))
     t.daemon = True
     t.start()
-    while t.isAlive() and not mailpile.util.QUITTING:
+    while t.is_alive() and not mailpile.util.QUITTING:
         t.join(timeout=1)
     if not o:
         raise EOFError()

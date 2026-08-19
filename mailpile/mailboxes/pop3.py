@@ -1,6 +1,12 @@
 from __future__ import print_function
+
 try:
-    import cStringIO as StringIO
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    from io import StringIO
 except ImportError:
     import StringIO
 
@@ -118,7 +124,7 @@ class POP3Mailbox(Mailbox):
     def _refresh(self):
         with self._lock:
             self._keys = None
-            self.iterkeys()
+            self.keys()
 
     def __setitem__(self, key, message):
         """Replace the keyed message; raise KeyError if it doesn't exist."""
@@ -126,7 +132,7 @@ class POP3Mailbox(Mailbox):
 
     def _get(self, key, _bytes=None):
         with self._lock:
-            if key not in self.iterkeys():
+            if key not in self.keys():
                 raise KeyError('Invalid key: %s' % key)
 
             self._connect()
@@ -177,7 +183,7 @@ class POP3Mailbox(Mailbox):
     def get_msg_size(self, key):
         with self._lock:
             self._connect()
-            if key not in self.iterkeys():
+            if key not in self.keys():
                 raise KeyError('Invalid key: %s' % key)
             ok, info, octets = self._pop3.list(self._km[key]).split()
             return int(octets)
@@ -187,7 +193,7 @@ class POP3Mailbox(Mailbox):
         #        messages at once.
         with self._lock:
             self._connect()
-            if key not in self.iterkeys():
+            if key not in self.keys():
                 raise KeyError('Invalid key: %s' % key)
             ok = self._pop3.dele(self._km[key])
             self._refresh()
@@ -213,11 +219,11 @@ class POP3Mailbox(Mailbox):
 
     def __contains__(self, key):
         """Return True if the keyed message exists, False otherwise."""
-        return key in self.iterkeys()
+        return key in self.keys()
 
     def __len__(self):
         """Return a count of messages in the mailbox."""
-        return len(self.iterkeys())
+        return len(self.keys())
 
     def flush(self):
         """Write any pending changes to the disk."""
@@ -291,7 +297,7 @@ if __name__ == "__main__":
         >>> pm.stat()
         (2, 123456)
 
-        >>> pm.iterkeys()
+        >>> pm.keys()
         ['evil', 'good']
 
         >>> 'evil' in pm, 'bogon' in pm
@@ -353,7 +359,7 @@ if __name__ == "__main__":
 
                 return cmd
             for cmd, rval in dict_merge(self.DEFAULT_RESULTS, self.RESULTS
-                                        ).iteritems():
+                                        ).items():
                 self.__setattr__(cmd, mkcmd(rval))
 
         def list(self, which=None):
@@ -371,7 +377,7 @@ if __name__ == "__main__":
 
         >>> pm = POP3Mailbox('localhost', user='a', password='b',
         ...                  conn_cls=_MockPOP3_Without_UIDL)
-        >>> pm.iterkeys()
+        >>> pm.keys()
         Traceback (most recent call last):
            ...
         UnsupportedProtocolError

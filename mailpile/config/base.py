@@ -2,8 +2,26 @@ from __future__ import print_function
 import io
 import json
 import os
-import ConfigParser
-from urllib import quote, unquote
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
+try:
+    import ConfigParser
+except ImportError:
+    import configparser as ConfigParser
+try:
+    from urllib import quote, unquote
+except ImportError:
+    from urllib.parse import quote, unquote
 
 from mailpile.i18n import gettext as _
 from mailpile.i18n import ngettext as _n
@@ -47,7 +65,7 @@ def CriticalConfigRule(*args):
 def ConfigPrinter(cfg, indent=''):
     rv = []
     if isinstance(cfg, dict):
-        pairer = cfg.iteritems()
+        pairer = cfg.items()
     else:
         pairer = enumerate(cfg)
     for key, val in pairer:
@@ -81,7 +99,7 @@ class CommentedEscapedConfigParser(ConfigParser.RawConfigParser):
 
     >>> cfg = u'[config/sys: Stuff]\\ndebug = True ; Ignored comment'
     >>> cecp = CommentedEscapedConfigParser()
-    >>> cecp.readfp(io.BytesIO(cfg.encode('utf-8')))
+    >>> cecp.read_file(io.StringIO(cfg))
     >>> cecp.get('config/sys: Stuff', 'debug') == 'True'
     True
 
@@ -93,8 +111,8 @@ class CommentedEscapedConfigParser(ConfigParser.RawConfigParser):
     SAFE = '!?: /#@<>[]()=-'
 
     def set(self, section, key, value, comment):
-        key = unicode(key).encode('utf-8')
-        section = unicode(section).encode('utf-8')
+        key = str(key)
+        section = str(section)
 
         if isinstance(value, unicode):
             value = quote(value.encode('utf-8'), safe=self.SAFE)
@@ -116,16 +134,16 @@ class CommentedEscapedConfigParser(ConfigParser.RawConfigParser):
         if value.startswith(self.NOT_UTF8):
             return unquote(value[len(self.NOT_UTF8):])
         else:
-            return unquote(value).decode('utf-8')
+            val = unquote(value); return val if isinstance(val, str) else val.decode('utf-8')
 
     def get(self, section, key):
-        key = unicode(key).encode('utf-8')
-        section = unicode(section).encode('utf-8')
+        key = str(key)
+        section = str(section)
         value = ConfigParser.RawConfigParser.get(self, section, key)
         return self._decode_value(value)
 
     def items(self, section):
-        return [(k.decode('utf-8'), self._decode_value(i)) for k, i
+        return [(k.decode('utf-8') if isinstance(k, bytes) else k, self._decode_value(i)) for k, i
                 in ConfigParser.RawConfigParser.items(self, section)]
 
 
@@ -280,7 +298,7 @@ def RuledContainer(pcls):
         def set_rules(self, rules):
             safe_assert(isinstance(rules, dict))
             self.reset()
-            for key, rule in rules.iteritems():
+            for key, rule in rules.items():
                 self.add_rule(key, rule)
 
         def add_rule(self, key, rule):
@@ -455,7 +473,7 @@ def RuledContainer(pcls):
             if not checker is True:
                 if checker is False:
                     if isinstance(value, dict) and isinstance(self[key], dict):
-                        for k, v in value.iteritems():
+                        for k, v in value.items():
                             self[key][k] = v
                         return
                     raise ConfigValueError(_('Modifying %s/%s is not '
@@ -525,7 +543,7 @@ class ConfigList(RuledContainer(list)):
         if rules:
             self.rules = {}
         if data:
-            self[:] = []
+            list.__setitem__(self, slice(None), [])
 
     def __createkey_and_setitem__(self, key, value):
         while key > len(self):
@@ -575,14 +593,14 @@ class ConfigList(RuledContainer(list)):
         return (self.fmt_key(i) for i in range(0, len(self)))
 
     def iteritems(self):
-        for k in self.iterkeys():
+        for k in self.keys():
             yield (k, self[k])
 
     def keys(self):
-        return list(self.iterkeys())
+        return list(range(len(self)))
 
     def all_keys(self):
-        return list(self.iterkeys())
+        return list(self.keys())
 
     def values(self):
         return self[:]
@@ -746,7 +764,7 @@ class ConfigDict(RuledContainer(dict)):
         u'Invalid (internal): section config/sys, ...
         """
         parser = CommentedEscapedConfigParser()
-        parser.readfp(io.BytesIO(str(data)))
+        parser.read_file(io.StringIO(str(data)))
 
         def item_sorter(i):
             try:

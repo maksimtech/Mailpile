@@ -1,5 +1,17 @@
 """Options
 
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
 Abstract:
 
 Options.options is a globally shared options object.

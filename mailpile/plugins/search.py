@@ -22,6 +22,18 @@ from mailpile.vfs import vfs, FilePath
 from mailpile.vcard import AddressInfo
 
 
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
 _plugins = PluginManager(builtin=__file__)
 
 
@@ -241,7 +253,7 @@ class SearchResults(dict):
         # Reverse the mapping
         thr_map = {}
         first_mid = thr_info[0][self.idx.MSG_MID]
-        for msg_mid, (par_mid, m_info) in par_map.iteritems():
+        for msg_mid, (par_mid, m_info) in par_map.items():
             if par_mid is None:
                 # If we have no parent, pretend the first message in the
                 # thread is the parent.
@@ -897,7 +909,7 @@ class Search(Command):
                 # save this, since the sort below may collapse the results.
                 raw_results = list(session.results)
 
-            for pmid, emid in list(self._email_view_pairs.iteritems()):
+            for pmid, emid in list(self._email_view_pairs.items()):
                 # Make sure all our requested messages are amongst results
                 pmid_idx = int(pmid, 36)
                 if pmid_idx not in session.results:
@@ -920,7 +932,7 @@ class Search(Command):
         if self._email_view_pairs:
             new_tids = set(
                 [t._key for t in session.config.get_tags(type='unread')])
-        for pmid, emid in list(self._email_view_pairs.iteritems()):
+        for pmid, emid in list(self._email_view_pairs.items()):
             try:
                 if emid == '*':
                     pmid_idx = int(pmid, 36)

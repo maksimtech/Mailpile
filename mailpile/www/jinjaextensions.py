@@ -7,9 +7,18 @@ import urllib
 import json
 import shlex
 import time
-from jinja2 import nodes, UndefinedError, Markup
+from jinja2 import nodes, UndefinedError
+try:
+    from jinja2 import Markup
+except ImportError:
+    from markupsafe import Markup
 from jinja2.ext import Extension
-from jinja2.utils import contextfunction, import_string, escape
+from jinja2.utils import import_string
+try:
+    from jinja2.utils import contextfunction, escape
+except ImportError:
+    from jinja2 import pass_context as contextfunction
+    from markupsafe import escape
 
 #from markdown import markdown
 
@@ -23,6 +32,18 @@ from mailpile.urlmap import UrlMap
 from mailpile.plugins import PluginManager
 from mailpile.vcard import AddressInfo
 
+
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
 
 VERSION_IDENTIFIER = None
 
@@ -258,7 +279,7 @@ class MailpileCommand(Extension):
                 setups.append('$("%s").each(function(){%s(this);});'
                               % (classfmt % elem, elem['javascript_setup']))
             if elem.get('javascript_events'):
-                for event, call in elem.get('javascript_events').iteritems():
+                for event, call in elem.get('javascript_events').items():
                     setups.append('$("%s").bind("%s", %s);' %
                         (classfmt % elem, event, call))
         return Markup("function(){%s}" % ''.join(setups))

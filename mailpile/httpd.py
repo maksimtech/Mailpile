@@ -2,8 +2,11 @@
 # Mailpile's built-in HTTPD
 #
 ###############################################################################
-import Cookie
-import cStringIO
+try:
+    import Cookie
+except ImportError:
+    from http import cookies as Cookie
+import io as cStringIO
 import hashlib
 import gzip
 import mimetypes
@@ -11,13 +14,37 @@ import os
 import random
 import select
 import socket
-import SocketServer
+try:
+    import SocketServer
+except ImportError:
+    import socketserver as SocketServer
 import time
 import threading
 import traceback
-from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
-from urllib import quote, unquote
-from urlparse import parse_qs, urlparse
+try:
+    from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
+except ImportError:
+    from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
+try:
+    from urllib import quote, unquote
+except ImportError:
+    from urllib.parse import quote, unquote
+try:
+    from urlparse import parse_qs, urlparse
+except ImportError:
+    from urllib.parse import parse_qs, urlparse
 
 import mailpile.util
 import mailpile.security as security
@@ -250,7 +277,7 @@ class HttpRequestHandler(SimpleXMLRPCRequestHandler):
                                   '\x1f\x8b', 'BZ', 'PK' # GZIP, BZIP, PKZIP
                                   )) and
                 ('gzip' in self.headers.get('accept-encoding', ''))):
-            gzipped = cStringIO.StringIO()
+            gzipped = io.BytesIO()
             with gzip.GzipFile(fileobj=gzipped, mode='w') as fd:
                 fd.write(data)
             gzipped = gzipped.getvalue()

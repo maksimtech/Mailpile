@@ -1,6 +1,12 @@
 import time
-from urlparse import parse_qs, urlparse
-from urllib import quote, urlencode
+try:
+    from urlparse import parse_qs, urlparse
+except ImportError:
+    from urllib.parse import parse_qs, urlparse
+try:
+    from urllib import quote, urlencode
+except ImportError:
+    from urllib.parse import quote, urlencode
 
 from mailpile.commands import Command
 from mailpile.crypto.gpgi import GnuPG
@@ -115,7 +121,7 @@ class Authenticate(Command):
 
     @classmethod
     def RedirectBack(cls, url, data):
-        qs = [(k, v.encode('utf-8')) for k, vl in data.iteritems() for v in vl
+        qs = [(k, v.encode('utf-8')) for k, vl in data.items() for v in vl
               if k not in ['_method', '_path'] + cls.HTTP_POST_VARS.keys()]
         qs = urlencode(qs)
         url = ''.join([url, '?%s' % qs if qs else ''])
@@ -330,7 +336,7 @@ class SetPassphrase(Command):
     def _list_keys(self, **kwargs):
         keylist = self._gnupg().list_secret_keys()
         profiles = self._get_profiles()
-        for fingerprint, key_info in keylist.iteritems():
+        for fingerprint, key_info in keylist.items():
             self._massage_key_info(fingerprint, key_info,
                                    profiles=profiles, **kwargs)
         return keylist
@@ -362,9 +368,9 @@ class SetPassphrase(Command):
                     if accounts[username]['policy'] is None:
                         del accounts[username]['policy']
 
-        for msid, route in self.session.config.routes.iteritems():
+        for msid, route in self.session.config.routes.items():
             _add_account(route, 'route')
-        for msid, source in self.session.config.sources.iteritems():
+        for msid, source in self.session.config.sources.items():
             _add_account(source, 'source')
 
         return accounts
@@ -482,11 +488,11 @@ class SetPassphrase(Command):
 
                 indirect_pwd = '_SECRET_:%s:%s' % (fingerprint, time.time())
                 if update_ms:
-                    for msid, source in config.sources.iteritems():
+                    for msid, source in config.sources.items():
                         if _account_matches(source):
                             source.password = indirect_pwd
                 if update_mr:
-                    for msid, route in config.routes.iteritems():
+                    for msid, route in config.routes.items():
                         if _account_matches(route):
                             route.password = indirect_pwd
 

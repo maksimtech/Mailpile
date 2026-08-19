@@ -53,7 +53,10 @@ import datetime
 import re
 import time
 import traceback
-import urllib2
+try:
+    import urllib2
+except ImportError:
+    import urllib.request as urllib2
 from email import encoders
 from email.mime.base import MIMEBase
 

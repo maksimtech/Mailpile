@@ -53,7 +53,7 @@ class DAVClient:
         if self.auth:
             req.putheader("Authorization", "Basic %s" % self.auth)
 
-        for key, value in headers.iteritems():
+        for key, value in headers.items():
             req.putheader(key, value)
 
         req.endheaders()

@@ -5,7 +5,7 @@ import shutil
 import stat
 import sys
 import unittest
-from cStringIO import StringIO
+from io import StringIO
 
 # Mailpile core
 import mailpile

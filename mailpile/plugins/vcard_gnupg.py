@@ -63,7 +63,7 @@ class GnuPGImporter(VCardImporter):
             deleted = set()
             deleted_names = {}
             search = ';%s/' % self.config.guid
-            for cardid, vcard in (vcards or {}).iteritems():
+            for cardid, vcard in (vcards or {}).items():
                 for vcl in vcard.get_all('clientpidmap'):
                     if search in vcl.value:
                         key_id = vcl.value.split(';')[1]
@@ -103,7 +103,7 @@ class GnuPGImporter(VCardImporter):
     def vcards_one_per_uid(cls, keys, vcards, kindhint=None):
         """This creates one VCard per e-mail address found in UIDs"""
         new_vcards = []
-        for key_id, key in keys.iteritems():
+        for key_id, key in keys.items():
             if cls.key_is_useless(key):
                 continue
             for uid in key.get('uids', []):
@@ -129,7 +129,7 @@ class GnuPGImporter(VCardImporter):
     def vcards_per_key(cls, keys, vcards):
         """This creates on VCards per key"""
         new_vcards = []
-        for key_id, key in keys.iteritems():
+        for key_id, key in keys.items():
             if cls.key_is_useless(key):
                 continue
             vcls = [cls.key_vcl(key_id, key)]
@@ -156,7 +156,7 @@ class GnuPGImporter(VCardImporter):
     def vcards_merged(cls, keys, vcards):
         """This creates merged VCards, grouping by uid/e-mail and key"""
         new_vcards = []
-        for key_id, key in keys.iteritems():
+        for key_id, key in keys.items():
             if cls.key_is_useless(key):
                 continue
             vcls = [cls.key_vcl(key_id, key)]

@@ -1,11 +1,17 @@
 # vim: set fileencoding=utf-8 :
+
+from __future__ import print_function
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 """ Backport of Python > 3.3 email.header.decode_header()
 
 It includes fixes that have not been ported to py2
 https://bugs.python.org/issue1079
 
 """
-from __future__ import print_function
 import binascii
 import email.quoprimime
 import email.base64mime

@@ -2,7 +2,10 @@ from __future__ import print_function
 import json
 import time
 import traceback
-from urllib import urlencode, quote_plus
+try:
+    from urllib import urlencode, quote_plus
+except ImportError:
+    from urllib.parse import urlencode, quote_plus
 
 from mailpile.i18n import gettext
 from mailpile.i18n import ngettext as _n
@@ -92,7 +95,7 @@ class OAuth2(TestableWebbable):
 
     @classmethod
     def ActivateHardCodedOAuth(cls, config):
-        for name, cfg in cls.HARD_CODED_OAUTH2.iteritems():
+        for name, cfg in cls.HARD_CODED_OAUTH2.items():
             if name not in config.oauth.providers.keys():
                 config.oauth.providers[name] = cfg
 
@@ -101,7 +104,7 @@ class OAuth2(TestableWebbable):
         cls.ActivateHardCodedOAuth(config)
         if oname:
             return (oname, config.oauth.providers[oname])
-        for name, cfg in config.oauth.providers.iteritems():
+        for name, cfg in config.oauth.providers.items():
             if re.match(cfg['server_re'], hostname):
                  return (name, cfg)
         return (None, None)
@@ -229,10 +232,10 @@ class OAuth2(TestableWebbable):
 
             # This helps the mail sources/routes detect that it may
             # be worth trying the connection again...
-            for msid, source in config.sources.iteritems():
+            for msid, source in config.sources.items():
                 if source.username == username:
                     source.password = tok_info.access_token
-            for msid, route in config.routes.iteritems():
+            for msid, route in config.routes.items():
                 if route.username == username:
                     route.password = tok_info.access_token
 

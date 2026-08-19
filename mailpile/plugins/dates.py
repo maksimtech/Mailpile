@@ -6,6 +6,12 @@ from mailpile.i18n import gettext as _
 from mailpile.i18n import ngettext as _n
 
 
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
 _plugins = PluginManager(builtin=__name__)
 
 

@@ -54,8 +54,20 @@
 # Agreement.
 
 
-"""Classes to generate plain text from a message object tree."""
+
+
 from __future__ import print_function
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
+"""Classes to generate plain text from a message object tree."""
 
 __all__ = ['Generator', 'DecodedGenerator']
 
@@ -65,7 +77,7 @@ import time
 import random
 import warnings
 
-from cStringIO import StringIO
+from io import StringIO
 from email.header import Header
 
 from mailpile.i18n import gettext as _

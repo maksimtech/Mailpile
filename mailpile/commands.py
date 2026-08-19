@@ -20,6 +20,12 @@ from mailpile.vfs import vfs
 
 
 # Commands starting with _ don't get single-letter shortcodes...
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 COMMANDS = []
 COMMAND_GROUPS = ['Internals', 'Config', 'Searching', 'Tagging', 'Composing']
 
@@ -160,7 +166,7 @@ class Command(object):
             if (isinstance(result, (list, tuple)) and
                     (not result or isinstance(result[0], (list, tuple)))):
                 import csv, StringIO
-                output = StringIO.StringIO()
+                output = io.StringIO()
                 writer = csv.writer(output, dialect='excel')
                 for row in result:
                     writer.writerow([unicode(r).encode('utf-8') for r in row])
@@ -214,7 +220,7 @@ class Command(object):
 
             return self.rendered[cache_id]
 
-    def __init__(self, session, name=None, arg=None, data=None, async=False):
+    def __init__(self, session, name=None, arg=None, data=None, is_async=False):
         self.session = session
         self.context = None
         self.name = self.SYNOPSIS[1] or self.SYNOPSIS[2] or name
@@ -223,7 +229,7 @@ class Command(object):
         self.message = name
         self.error_info = {}
         self.result = None
-        self.run_async = async
+        self.run_async = is_async
         if type(arg) in (type(list()), type(tuple())):
             self.args = tuple(arg)
         elif arg:
@@ -252,7 +258,7 @@ class Command(object):
         if self.COMMAND_CACHE_TTL < 1:
             return ''
         from mailpile.urlmap import UrlMap
-        args = sorted(list((sqa or self.state_as_query_args()).iteritems()))
+        args = sorted(list((sqa or self.state_as_query_args()).items()))
         args += '/%d' % self.session.ui.term.max_width
         # The replace() stuff makes these usable as CSS class IDs
         return ('%s-%s' % (UrlMap(self.session).ui_url(self),
@@ -493,7 +499,7 @@ class Command(object):
             return [self._sloppy_copy(i, name=name) for i in data]
         elif isinstance(data, dict):
             return dict((k, self._sloppy_copy(v, name=k))
-                        for k, v in data.iteritems())
+                        for k, v in data.items())
         else:
             return copy_value(data)
 

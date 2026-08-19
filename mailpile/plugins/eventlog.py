@@ -9,6 +9,12 @@ from mailpile.plugins import PluginManager
 from mailpile.util import *
 
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 _plugins = PluginManager(builtin=__file__)
 
 

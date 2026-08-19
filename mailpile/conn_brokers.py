@@ -33,11 +33,36 @@ from __future__ import print_function
 import datetime
 import socket
 import ssl
+# Python 3.12+ compatibility: ssl.wrap_socket was removed
+if not hasattr(ssl, 'wrap_socket'):
+    def _wrap_socket_compat(sock, keyfile=None, certfile=None,
+                            server_side=False, cert_reqs=ssl.CERT_NONE,
+                            ssl_version=None, ca_certs=None,
+                            do_handshake_on_connect=True,
+                            suppress_ragged_eofs=True, **kwargs):
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        if certfile:
+            ctx.load_cert_chain(certfile, keyfile)
+        if ca_certs:
+            ctx.load_verify_locations(ca_certs)
+        return ctx.wrap_socket(sock, server_side=server_side,
+                               do_handshake_on_connect=do_handshake_on_connect,
+                               suppress_ragged_eofs=suppress_ragged_eofs)
+    ssl.wrap_socket = _wrap_socket_compat
+
 import subprocess
 import sys
 import threading
 import time
 import traceback
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
 
 try:
     import cryptography
@@ -385,7 +410,7 @@ class TcpConnectionBroker(BaseConnectionBroker):
             raise CapabilityFailure('Cannot connect to .onion addresses')
 
     def _conn(self, address, *args, **kwargs):
-        clean_kwargs = dict((k, v) for k, v in kwargs.iteritems()
+        clean_kwargs = dict((k, v) for k, v in kwargs.items()
                             if not k.startswith('_'))
         return original_scc(address, *args, **clean_kwargs)
 
@@ -576,7 +601,10 @@ class BaseConnectionBrokerProxy(TcpConnectionBroker):
     def _wrap_ssl(self, conn):
         if self._debug is not None:
             self._debug('%s: Wrapping socket with SSL' % (self, ))
-        return ssl.wrap_socket(conn)
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        return ctx.wrap_socket(conn)
 
     def _create_connection(self, context, address, *args, **kwargs):
         address = self._proxy_address(address)
@@ -663,7 +691,7 @@ class MasterBroker(BaseConnectionBroker):
 
         """
         self.brokers.append((priority, cb(master=self)))
-        self.brokers.sort()
+        self.brokers.sort(key=lambda x: x[0])
         self.brokers.reverse()
 
     def get_fd_context(self, fileno):
@@ -702,7 +730,7 @@ class MasterBroker(BaseConnectionBroker):
                 et, v, t = sys.exc_info()
         if et is not None:
             context.error = '%s' % v
-            raise et, v, t
+            raise v.with_traceback(t)
 
         context.error = _('No connection method found')
         raise CapabilityFailure(context.error)
@@ -763,7 +791,7 @@ class GetTlsCertificate(Command):
             if self.result:
                 def fmt(h, r):
                     return '%s:\t%s' % (h, r[-1] or r[1])
-                return '\n'.join(fmt(h, r) for h, r in self.result.iteritems())
+                return '\n'.join(fmt(h, r) for h, r in self.result.items())
             return _('No certificates found')
 
     def command(self):

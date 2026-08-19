@@ -1,7 +1,10 @@
 import hashlib
 import ssl
 import urllib
-import urllib2
+try:
+    import urllib2
+except ImportError:
+    import urllib.request as urllib2
 
 from mailpile.security import secure_urlget
 from mailpile.commands import Command

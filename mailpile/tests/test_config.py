@@ -7,6 +7,12 @@ from nose.tools import raises
 from mailpile.tests import MailPileUnittest
 
 
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
 class TestConfig(MailPileUnittest):
 
     #

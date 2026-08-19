@@ -20,6 +20,12 @@ from mailpile.vcard import VCardLine, VCardStore, MailpileVCard, AddressInfo, GL
 from mailpile.util import *
 
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 _plugins = PluginManager(builtin=__file__)
 
 
@@ -672,7 +678,7 @@ class ContactImporters(Command):
 
     def command(self):
         res = []
-        for iname, importer in CONTACT_IMPORTERS.iteritems():
+        for iname, importer in CONTACT_IMPORTERS.items():
             r = {}
             r["short_name"] = iname
             r["format_name"] = importer.format_name
@@ -1384,10 +1390,10 @@ class RemoveProfile(ProfileVCard(RemoveVCard)):
             if config.sources[source_id].username:
                 usernames.add(config.sources[source_id].username)
 
-        for msid, source in config.sources.iteritems():
+        for msid, source in config.sources.items():
             if (source.username in usernames) and (source.profile != vcard.random_uid):
                 usernames.remove(source.username)
-        for mrid, route in config.routes.iteritems():
+        for mrid, route in config.routes.items():
             if (route.username in usernames) and (mrid != vcard.route):
                 usernames.remove(source.username)
 
@@ -1425,7 +1431,7 @@ class RemoveProfile(ProfileVCard(RemoveVCard)):
                 config.mail_sources[source_id].event.flags = Event.COMPLETE
 
             # Keep the reference to our local mailboxes in sys.mailbox
-            for mbx_id, mbx_info in src.mailbox.iteritems():
+            for mbx_id, mbx_info in src.mailbox.items():
                 if mbx_info.primary_tag:
                     tids.add(mbx_info.primary_tag)
                 if mbx_info.local and (mbx_info.path[:1] == '@'):

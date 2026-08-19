@@ -3,12 +3,21 @@ import os
 import socket
 import re
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 try:
     import win_inet_pton
 except ImportError:
     pass
 
-from urlparse import urlparse
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 
 from mailpile.i18n import gettext as _
 from mailpile.i18n import ngettext as n

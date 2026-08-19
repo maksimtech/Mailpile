@@ -5,7 +5,10 @@ import string
 import sys
 import time
 import re
-import StringIO
+try:
+    import StringIO
+except ImportError:
+    import io as StringIO
 import tempfile
 import threading
 import traceback
@@ -27,6 +30,18 @@ from mailpile.crypto.state import *
 from mailpile.crypto.mime import MimeSigningWrapper, MimeEncryptingWrapper
 from mailpile.safe_popen import Popen, PIPE, Safe_Pipe
 
+
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
 
 _ = lambda s: s
 
@@ -777,10 +792,10 @@ class GnuPG:
 
     def _reap_threads(self):
         for tries in (1, 2, 3):
-            for name, thr in self.threads.iteritems():
-                if thr.isAlive():
+            for name, thr in self.threads.items():
+                if thr.is_alive():
                     thr.join(timeout=15)
-                    if thr.isAlive() and tries > 1:
+                    if thr.is_alive() and tries > 1:
                         print('WARNING: Failed to reap thread %s' % thr)
 
     def parse_status(self, line, *args):
@@ -861,7 +876,7 @@ class GnuPG:
             list_keys += ["--list-keys", fprint]
         retvals = self.run(list_keys)
         public_keys = self.parse_keylist(retvals[1]["stdout"])
-        for fprint, info in public_keys.iteritems():
+        for fprint, info in public_keys.items():
             if fprint in set(secret_keys):
                 for k in ("disabled", "revoked", "expired"):
                     secret_keys[fprint][k] = info[k]
@@ -1439,7 +1454,7 @@ class GnuPG:
     def address_to_keys(self, address):
         res = {}
         keys = self.list_keys(selectors=[address])
-        for key, props in keys.iteritems():
+        for key, props in keys.items():
             if any([x["email"] == address for x in props["uids"]]):
                 res[key] = props
 
@@ -1524,7 +1539,7 @@ def GetKeys(gnupg, config, people):
         # Keys are missing, so we try to just search the keychain
         all_keys.update(gnupg.list_keys(selectors=missing))
         found = []
-        for key_id, key in all_keys.iteritems():
+        for key_id, key in all_keys.items():
             for uid in key.get("uids", []):
                 if uid.get("email", None) in missing:
                     missing.remove(uid["email"])

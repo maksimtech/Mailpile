@@ -51,8 +51,9 @@ def gettext(string):
     #        not encoding it, the decode below may fail. :(
     translation = ACTIVE_TRANSLATION.org_gettext(string)
     try:
-        translation = translation.decode('utf-8')
-    except UnicodeEncodeError:
+        if isinstance(translation, bytes):
+            translation = translation.decode('utf-8')
+    except UnicodeDecodeError:
         pass
 
     return _fmt_safe(translation, string)
@@ -74,8 +75,9 @@ def ngettext(string1, string2, n):
     #        not encoding it, the decode below may fail. :(
     translation = ACTIVE_TRANSLATION.org_ngettext(string1, string2, n)
     try:
-        translation = translation.decode('utf-8')
-    except UnicodeEncodeError:
+        if isinstance(translation, bytes):
+            translation = translation.decode('utf-8')
+    except UnicodeDecodeError:
         pass
 
     return _fmt_safe(translation, default)
@@ -114,14 +116,13 @@ def ActivateTranslation(session, config, language, localedir=None):
     elif language:
         try:
             trans = translation("mailpile", localedir,
-                                [language], codeset="utf-8")
+                                [language])
         except IOError:
             if session:
                 session.ui.debug('Failed to load language %s' % language)
 
     if not trans:
-        trans = translation("mailpile", localedir,
-                            codeset='utf-8', fallback=True)
+        trans = translation("mailpile", localedir, fallback=True)
 
         if session:
             session.ui.debug('Failed to configure i18n (%s). '
@@ -136,7 +137,7 @@ def ActivateTranslation(session, config, language, localedir=None):
         trans.org_ngettext = trans.ngettext
         trans.gettext = lambda t, g: gettext(g)
         trans.ngettext = lambda t, s1, s2, n: ngettext(s1, s2, n)
-        trans.set_output_charset("utf-8")
+        # trans.set_output_charset("utf-8")  # removed in Python 3
 
         if hasattr(config, 'jinja_env'):
             config.jinja_env.install_gettext_translations(trans,

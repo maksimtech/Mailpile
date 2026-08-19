@@ -25,7 +25,16 @@ from __future__ import print_function
 import os
 import subprocess
 import sys
-import thread
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
+try:
+    import thread
+except ImportError:
+    import _thread as thread
 import threading
 
 import mailpile.platforms

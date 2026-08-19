@@ -13,6 +13,12 @@ from mailpile.i18n import ngettext as _n
 from mailpile.util import *
 
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 GLOBAL_POSTING_LOCK = PListRLock()
 GLOBAL_OPTIMIZE_LOCK = PListLock()
 
@@ -128,7 +134,7 @@ class PostingListContainer(object):
     def purge_deleted(self, deleted_sig, deleted_set):
         changes = 0
         for sig in self.words:
-	    overlap = (self.words[sig] & deleted_set)
+            overlap = (self.words[sig] & deleted_set)
             if (sig != deleted_sig) and overlap:
                 self.words[sig] -= overlap
                 changes += len(overlap)
@@ -152,7 +158,7 @@ class PostingListContainer(object):
             # Optimizing for fast loads, so deletion only happens on save.
             output = '\n'.join('\t'.join(l) for l
                                in ([sig] + [str(v) for v in vals]
-                                   for sig, vals in self.words.iteritems())
+                                   for sig, vals in self.words.items())
                                if len(l) > 1)
             t.append(time.time())
 
@@ -186,7 +192,7 @@ class PostingListContainer(object):
         splits = [self]
         if len(self.sig) < self.MAX_HASH_LEN:
             total, sums = 0, {}
-            for sig, values in self.words.iteritems():
+            for sig, values in self.words.items():
                 total += len(values)
                 if len(values) >= (self.MAX_ITEMS / 2):
                     nsig = sig[:self.MAX_HASH_LEN]

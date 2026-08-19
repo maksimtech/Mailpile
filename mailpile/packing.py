@@ -6,6 +6,12 @@ import zlib
 from mailpile.util import *
 
 
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
 def PackIntSet(ints):
     """
     Pack a set of ints to a compact string, unpackable by UnpackIntSet.

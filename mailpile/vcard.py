@@ -10,6 +10,12 @@ from mailpile.i18n import gettext as _
 from mailpile.i18n import ngettext as _n
 from mailpile.util import *
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 GLOBAL_VCARD_LOCK = VCardRLock()
 
 
@@ -61,7 +67,7 @@ class VCardLine(dict):
         "\n": "\\n",
         "\r": "\\r",
     }
-    QUOTE_RMAP = dict([(v, k) for k, v in QUOTE_MAP.iteritems()])
+    QUOTE_RMAP = dict([(v, k) for k, v in QUOTE_MAP.items()])
 
     def __init__(self, line=None, name=None, value=None, **attrs):
         self._name = name and unicode(name).lower() or None
@@ -684,7 +690,7 @@ class SimpleVCard(object):
     def get(self, key, default=None, n=0, prefer=None):
         lines = self.get_all(key)
         if prefer:
-            for k, v in prefer.iteritems():
+            for k, v in prefer.items():
                 llines = [l for l in lines if l.get(k) == v]
                 if llines:
                     lines = llines
@@ -1070,7 +1076,7 @@ class MailpileVCard(SimpleVCard):
     def get_source_by_proto(self, protocol, create=False, name=None):
         my_rid = self.random_uid
         source = None
-        for src_id, src in self.config.sources.iteritems():
+        for src_id, src in self.config.sources.items():
             if src.profile == my_rid and src.protocol == protocol:
                 if not name or src.name == name:
                     source = src

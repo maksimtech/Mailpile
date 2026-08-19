@@ -17,7 +17,10 @@ import math
 import traceback
 import ssl
 import urllib
-import urllib2
+try:
+    import urllib2
+except ImportError:
+    import urllib.request as urllib2
 from mailpile.commands import Command
 from mailpile.conn_brokers import Master as ConnBroker
 from mailpile.crypto import gpgi
@@ -32,6 +35,12 @@ from mailpile.security import secure_urlget
 from mailpile.util import *
 from mailpile.vcard import AddressInfo, VCardLine, MailpileVCard
 
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
 
 __all__ = ['email_keylookup', 'wkd']
 
@@ -113,7 +122,7 @@ def _update_scores(session, key_id, key_info, known_keys_list):
         key_info.scores['Encryption key strength'] = [score, key_strength]
 
     key_info.score = sum(score for source, (score, reason)
-                         in key_info.scores.iteritems())
+                         in key_info.scores.items())
 
     sc, reason = max([(abs(score), reason)
                      for score, reason in key_info['scores'].values()])
@@ -239,7 +248,7 @@ def lookup_crypto_keys(session, address,
             results = {}
 
         # FIXME: This merging of info about keys is probably misguided.
-        for key_id, key_info in results.iteritems():
+        for key_id, key_info in results.items():
             if key_id in found_keys:
                 old_scores = found_keys[key_id].scores
                 old_uids = found_keys[key_id].uids
@@ -437,7 +446,7 @@ class KeyTofu(Command):
             and len(recent_crypto)) or False
 
     def _key_is_trusted(self, fingerprint, known_keys_list):
-        for summary, key_info in known_keys_list.iteritems():
+        for summary, key_info in known_keys_list.items():
             if key_info['fingerprint'] == fingerprint:
                 return (key_info['validity'] in KeyInfo.KEY_TRUSTED_CODES)
         return False
@@ -555,7 +564,7 @@ class KeyTofu(Command):
                     status[email] = 'Have not seen enough PGP messages'
 
         imported = {}
-        for email, (key_id, origins) in should_import.iteritems():
+        for email, (key_id, origins) in should_import.items():
             if 'keytofu' in self.session.config.sys.debug:
                 self.session.ui.debug('keytofu(%s): importing %s from %s'
                                       % (email, key_id, origins))
@@ -646,7 +655,7 @@ class LookupHandler:
         keys = {}
         if get is not None:
             get = [unicode(g).upper() for g in get]
-        for key_id, key_info in all_keys.iteritems():
+        for key_id, key_info in all_keys.items():
             fprint = unicode(key_info.fingerprint).upper()
             summary = key_info.summary()
             if ((get is None) or
@@ -693,7 +702,7 @@ class KeychainLookupHandler(LookupHandler):
         address = address.lower()
         results = {}
         vcard = self.session.config.vcards.get_vcard(address)
-        for key_id, key_info in self.known_keys.iteritems():
+        for key_id, key_info in self.known_keys.items():
             match = False
             for uid in key_info.uids:
                 if not strict_email_match:

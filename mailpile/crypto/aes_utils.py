@@ -17,6 +17,12 @@ import struct
 from hashlib import md5
 
 
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
 def make_cryptography_utils():
     import os
     import cryptography.hazmat.backends

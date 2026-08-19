@@ -12,8 +12,26 @@ import socket
 import subprocess
 import sys
 import traceback
-import thread
-import threading
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
+try:
+    import thread
+except ImportError:
+    import _thread as thread
+try:
+    import thread
+except ImportError:
+    import _thread as threading
 import time
 import webbrowser
 
@@ -716,7 +734,7 @@ class ProgramStatus(Command):
                           'timestamp': v.ts,
                           'userdata': v.data,
                           'userinfo': v.auth} for k, v in
-                         mailpile.auth.SESSION_CACHE.iteritems()],
+                         mailpile.auth.SESSION_CACHE.items()],
             'pl_timers': mailpile.postinglist.TIMERS,
             'delay': play_nice_with_threads(sleep=False),
             'live': mailpile.util.LIVE_USER_ACTIVITIES,
@@ -2078,7 +2096,7 @@ class HelpVars(Help):
             variables = []
             what = config[cat]
             if isinstance(what[2], dict):
-                for ii, i in what[2].iteritems():
+                for ii, i in what[2].items():
                     stype = (
                         _('(subsection)') if isinstance(i[1], dict) else
                         '|'.join(i[1]) if isinstance(i[1], (list, tuple)) else

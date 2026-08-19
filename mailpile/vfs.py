@@ -26,6 +26,12 @@ from mailpile.i18n import gettext as _
 from mailpile.util import safe_assert
 
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 VFS_HANDLERS = []
 VFS_ALIASES = {}
 
@@ -61,7 +67,7 @@ class FilePath(object):
                     cooked_fp[-2:] == '=!'):
                 self.raw_fp = self.unalias(cooked_fp[:-2].decode('base64'))
             elif isinstance(cooked_fp, unicode):
-                self.raw_fp = self.unalias(cooked_fp.encode('utf-8'))
+                self.raw_fp = self.unalias(cooked_fp)
             else:
                 self.raw_fp = self.unalias(str(cooked_fp))
         else:
@@ -81,7 +87,7 @@ class FilePath(object):
         while fp[:2] == './':
             fp = fp[2:]
         alias, prefix = None, ''
-        for a, p in VFS_ALIASES.iteritems():
+        for a, p in VFS_ALIASES.items():
             if len(p) > len(prefix) and fp.startswith(p):
                 alias, prefix = a, p
         if alias:
@@ -364,7 +370,7 @@ class MailpileVfsRoot(MailpileVfsBase):
 
     def _entries(self):
         e = copy.copy(self.entries)
-        for msid, msobj in self.config.mail_sources.iteritems():
+        for msid, msobj in self.config.mail_sources.items():
             if msobj and msobj.my_config and msobj.my_config.enabled:
                 e['msrc.%s' % msid] = (
                     FilePath('/src:%s' % msid), msobj.name, 'MailSource')

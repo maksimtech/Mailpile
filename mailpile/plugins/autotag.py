@@ -58,7 +58,7 @@ def autotag_configs(config):
     if not taggers:
         return
 
-    for tid, tag_info in config.tags.iteritems():
+    for tid, tag_info in config.tags.items():
         auto_tagging = (tag_info.auto_tag or '')
         if (tid not in done and
                 auto_tagging.lower() not in AUTO_TAG_DISABLED):

@@ -33,6 +33,12 @@ from mailpile.i18n import ngettext as _n
 from mailpile.util import *
 
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 class SuppressHtmlOutput(Exception):
     pass
 

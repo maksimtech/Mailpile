@@ -14,6 +14,12 @@ from mailpile.util import EventRLock, EventLock, CleanText, json_helper
 from mailpile.util import safe_remove, thread_context
 
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 EVENT_COUNTER_LOCK = threading.Lock()
 EVENT_COUNTER = 0
 
@@ -28,7 +34,7 @@ def NewEventId():
     with EVENT_COUNTER_LOCK:
         EVENT_COUNTER = EVENT_COUNTER+1
         EVENT_COUNTER %= 0x100000
-        return '%8.8x-%5.5x-%x' % (time.time(), EVENT_COUNTER, os.getpid())
+        return '%8.8x-%5.5x-%x' % (int(time.time()), EVENT_COUNTER, os.getpid())
 
 
 def _ClassName(obj, ignore_regexps=False):
@@ -295,7 +301,7 @@ class EventLog(object):
                 return unicode(val) == unicode(rule)
             else:
                 return rule.match(unicode(val)) is not None
-        for kw, rule in filters.iteritems():
+        for kw, rule in filters.items():
             if kw.endswith('!'):
                 truth, okw, kw = False, kw, kw[:-1]
             else:
@@ -423,7 +429,7 @@ class EventLog(object):
                     # Nothing we can do, no point complaining...
                     pass
             self._prune_completed()
-            self._save_events(self._events.values())
+            self._save_events(list(self._events.values()))
             return self
 
     def purge_old_logfiles(self, keep=None):

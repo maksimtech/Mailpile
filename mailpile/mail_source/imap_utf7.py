@@ -7,6 +7,12 @@ import codecs
 
 # encoding
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 def modified_base64 (s):
   s = s.encode('utf-16be')
   return binascii.b2a_base64(s).rstrip('\n=').replace('/', ',')

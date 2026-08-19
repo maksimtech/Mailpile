@@ -182,7 +182,7 @@ class Tor(threading.Thread):
 
     def relaunch_hidden_services(self):
         hidden_services = copy.copy(self.hidden_services)
-        for onion, (portmap, key_t, key_c) in hidden_services.iteritems():
+        for onion, (portmap, key_t, key_c) in hidden_services.items():
             if key_t and key_c:
                 self.launch_hidden_service(portmap, key_t, key_c)
             else:

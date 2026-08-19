@@ -13,6 +13,12 @@ from mailpile.util import *
 
 ##[ Specialized threads ]######################################################
 
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
 class Cron(threading.Thread):
     """
     An instance of this class represents a cron-like worker thread
@@ -167,7 +173,7 @@ class Cron(threading.Thread):
                         the Cron thread exits.
         """
         self.ALIVE = False
-        if join and (not self.daemon) and self.isAlive():
+        if join and (not self.daemon) and self.is_alive():
             self.join()
 
 
@@ -329,7 +335,7 @@ class Worker(threading.Thread):
 
     def quit(self, session=None, join=True):
         self.die_soon(session=session)
-        if join and (not self.daemon) and self.isAlive():
+        if join and (not self.daemon) and self.is_alive():
             self.join()
 
 

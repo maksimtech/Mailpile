@@ -2,8 +2,20 @@ import datetime
 import os
 import random
 import re
-import thread
-import threading
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    import thread
+except ImportError:
+    import _thread as thread
+try:
+    import thread
+except ImportError:
+    import _thread as threading
 import traceback
 import time
 
@@ -856,7 +868,7 @@ class BaseMailSource(threading.Thread):
             gone = []
             src_keys = set(src.keys())
             loc_keys = set(loc.keys())
-            for key, val in loc.source_map.iteritems():
+            for key, val in loc.source_map.items():
                 if (val not in loc_keys) or (key not in src_keys):
                     gone.append(key)
             for key in gone:
@@ -1177,7 +1189,7 @@ class BaseMailSource(threading.Thread):
         self.interrupt_rescan(_('Shutdown'))
         self.alive = False
         self.wake_up()
-        if join and self.isAlive():
+        if join and self.is_alive():
             self.join()
 
 

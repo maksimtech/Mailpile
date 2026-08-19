@@ -1,5 +1,5 @@
 from __future__ import print_function
-import cStringIO
+import io
 import datetime
 import gzip
 import json
@@ -24,12 +24,18 @@ from mailpile.util import *
 from mailpile.vfs import FilePath, vfs
 
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 _ = lambda t: t
 _plugins = PluginManager(builtin=__file__)
 
 
 def _gzip(filename, data):
-    gzip_data = cStringIO.StringIO()
+    gzip_data = io.BytesIO()
     gzip_obj = gzip.GzipFile(filename, 'w', 9, gzip_data, 0)
     gzip_obj.write(data)
     gzip_obj.close()
@@ -37,12 +43,12 @@ def _gzip(filename, data):
 
 
 def _gunzip(data):
-    with gzip.GzipFile('', 'rb', 0, cStringIO.StringIO(data)) as gzf:
+    with gzip.GzipFile('', 'rb', 0, io.BytesIO(data)) as gzf:
         return gzf.read()
 
 
 def _decrypt(data, config):
-    with DecryptingStreamer(cStringIO.StringIO(data),
+    with DecryptingStreamer(io.BytesIO(data),
                             mep_key=config.get_master_key()) as fd:
         data = fd.read()
         fd.verify(_raise=IOError)
@@ -63,7 +69,7 @@ class MakeBackup(Command):
         # Not all tags are interesting! Most, but not all.
         keep = {}
         suppress = {}
-        for tid, tag in config.tags.iteritems():
+        for tid, tag in config.tags.items():
             if tag.type in ('tag', 'group', 'attribute', 'inbox', 'drafts',
                             'sent', 'spam', 'read', 'tagged', 'fwded',
                             'replied', 'search', 'profile'):
@@ -79,7 +85,7 @@ class MakeBackup(Command):
             msg_idx_set -= config.index.TAGS.get(tid, set([]))
 
         msg_id_list = [''] * len(config.index.INDEX)
-        for msgid, msg_idx in config.index.MSGIDS.iteritems():
+        for msgid, msg_idx in config.index.MSGIDS.items():
             if msg_idx in msg_idx_set:
                 msg_id_list[msg_idx] = msgid
 
@@ -98,7 +104,7 @@ class MakeBackup(Command):
             backup_fn = 'Mailpile_Backup_%s.zip' % (backup_date,)
 
         # Prep archive!
-        backup_data = cStringIO.StringIO()
+        backup_data = io.BytesIO()
         backup_zip = zipfile.ZipFile(backup_data, 'w', zipfile.ZIP_DEFLATED)
         backup_zip.writestr('README.txt', (('\n'.join([
             _("This is a backup of Mailpile v%(ver)s keys and configuration."),
@@ -261,7 +267,7 @@ class RestoreBackup(Command):
             else:
                 return False
 
-        for i, mbx_path in config.sys.mailbox.iteritems():
+        for i, mbx_path in config.sys.mailbox.items():
             mbx_path = FilePath(mbx_path)
             if not path_ok(mbx_path):
                 config.sys.mailbox[i] = '/dev/null'
@@ -307,7 +313,7 @@ class RestoreBackup(Command):
         if backup_data is not None:
             try:
                 if isinstance(backup_data, str):
-                    backup_data = cStringIO.StringIO(backup_data)
+                    backup_data = io.BytesIO(backup_data)
                 backup_zip = zipfile.ZipFile(backup_data, 'r')
 
                 # Load and validate metadata (from README.txt)

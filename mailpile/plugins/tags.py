@@ -11,6 +11,12 @@ from mailpile.util import *
 from mailpile.plugins.search import Search
 
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 _plugins = PluginManager(builtin=__file__)
 
 
@@ -794,7 +800,7 @@ class TagAutomation(Command):
         if '-all' in args:
             for tag in tags.values():
                 yield tag
-        for tid, tag in tags.iteritems():
+        for tid, tag in tags.items():
             if tid in args or tag.slug in args:
                 yield tag
 

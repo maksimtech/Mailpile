@@ -8,6 +8,7 @@ import copy
 import ctypes
 import datetime
 import hashlib
+import base64
 import inspect
 import locale
 import os
@@ -20,8 +21,23 @@ import sys
 import tempfile
 import threading
 import time
-import StringIO
-import cStringIO
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
+try:
+    import StringIO
+except ImportError:
+    import io as StringIO
+import io
 from distutils import spawn
 
 from mailpile.i18n import gettext as _
@@ -107,9 +123,9 @@ ATT_EXTS['media'] = (ATT_EXTS['audio'] + ATT_EXTS['font'] +
 
 B64C_STRIP = '\r\n='
 
-B64C_TRANSLATE = string.maketrans('/', '_')
+B64C_TRANSLATE = str.maketrans('/', '_')
 
-B64W_TRANSLATE = string.maketrans('/+', '_-')
+B64W_TRANSLATE = str.maketrans('/+', '_-')
 
 STRHASH_RE = re.compile('[^0-9a-z]+')
 
@@ -305,7 +321,9 @@ def b64c(b):
     >>> b64c("a+b+c+123+")
     'a+b+c+123+'
     """
-    return string.translate(b, B64C_TRANSLATE, B64C_STRIP)
+    if isinstance(b, bytes):
+        b = b.decode('utf-8', errors='replace')
+    return b.translate(B64C_TRANSLATE).translate(str.maketrans('', '', B64C_STRIP))
 
 
 def b64w(b):
@@ -318,7 +336,9 @@ def b64w(b):
     >>> b64w("a+b+c+123+")
     'a-b-c-123-'
     """
-    return string.translate(b, B64W_TRANSLATE, B64C_STRIP)
+    if isinstance(b, bytes):
+        b = b.decode('utf-8', errors='replace')
+    return b.translate(B64W_TRANSLATE).translate(str.maketrans('', '', B64C_STRIP))
 
 
 def escape_html(t):
@@ -368,7 +388,7 @@ def sha1b64(*data):
     Keyword arguments:
     s -- The string to hash
     """
-    return _hash(hashlib.sha1, data).digest().encode('base64')
+    return base64.b64encode(_hash(hashlib.sha1, data).digest())
 
 
 def sha512b64(*data):
@@ -384,7 +404,7 @@ def sha512b64(*data):
     Keyword arguments:
     s -- The string to hash
     """
-    return _hash(hashlib.sha512, data).digest().encode('base64')
+    return base64.b64encode(_hash(hashlib.sha512, data).digest())
 
 
 def md5_hex(*data):
@@ -965,7 +985,7 @@ def image_size(img_data, pure_python=False):
         if imgsize is not None:
             return imgsize.get_size(PeekableStringIO(img_data))
         if Image is not None and not pure_python:
-            return Image.open(cStringIO.StringIO(img_data)).size
+            return Image.open(io.BytesIO(img_data)).size
     except (ValueError, imgsize.UnknownSize):
         pass
     return None
@@ -991,7 +1011,7 @@ def thumbnail(fileobj, output_fd, height=None, width=None):
 
     # Ensure the source image is either a file-like object or a StringIO
     if (not isinstance(fileobj, (file, StringIO.StringIO))):
-        fileobj = cStringIO.StringIO(fileobj)
+        fileobj = io.BytesIO(fileobj)
 
     image = Image.open(fileobj)
     fmt = image.format
@@ -1120,14 +1140,14 @@ class RunTimedThread(threading.Thread):
         if self.unique:
             with TIMED_THREAD_LOCK:
                 old_thread = TIMED_THREADS.get(self.unique)
-                if (old_thread is not None) and old_thread.isAlive():
+                if (old_thread is not None) and old_thread.is_alive():
                     raise TimedOut('Old thread still alive: %s' % self.name)
                 TIMED_THREADS[self.unique] = self
 
         self.start()
         self.join(timeout=timeout)
 
-        if self.isAlive() or QUITTING:
+        if self.is_alive() or QUITTING:
             raise TimedOut('Timed out: %s' % self.name)
         else:
             if self.unique:
@@ -1150,7 +1170,7 @@ def RunTimed(timeout, func, *args, **kwargs):
     RunTimedThread(func.__name__, work, unique=unique).run_timed(timeout)
     if exception:
         t, v, tb = exception[0]
-        raise t, v, tb
+        raise v.with_traceback(tb)
     return result[0]
 
 

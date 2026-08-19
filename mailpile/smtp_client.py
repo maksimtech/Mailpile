@@ -125,7 +125,7 @@ def _RouteTuples(session, from_to_msg_ev_tuples, test_route=None):
 
                 # Group together recipients that use the same route
                 rid = '/'.join(sorted(['%s' % (k, )
-                                       for k in route.iteritems()]))
+                                       for k in route.items()]))
                 routes[rid] = route
                 rcpts[rid] = rcpts.get(rid, [])
                 rcpts[rid].append(recipient)

@@ -1,6 +1,18 @@
 """
 Global Mailpile crypto/privacy/security policy
 
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
 This module attempts to collect in one place all of the different
 security related decisions made by the app, in order to facilitate
 review and testing.
@@ -177,7 +189,10 @@ def secure_urlget(session, url,
                   data=None, timeout=30, anonymous=False, maxbytes=None,
                   padding=True):
     from mailpile.conn_brokers import Master as ConnBroker
-    from urllib2 import build_opener
+    try:
+        from urllib2 import build_opener
+    except ImportError:
+        from urllib.request import build_opener
 
     if session.config.prefs.web_content not in ("on", "anon"):
         raise IOError("Web content is disabled by policy")
@@ -755,9 +770,11 @@ if __name__ != "__main__":
                 return tls_new_context().wrap_socket(sock, *args, **kwargs)
             except:
                 raise
-        ssl.wrap_socket = monkey_patch(ssl.wrap_socket, add_tls_context)
+        if hasattr(ssl, "wrap_socket"):
+            ssl.wrap_socket = monkey_patch(ssl.wrap_socket, add_tls_context)
     else:
-        ssl.wrap_socket = monkey_patch(ssl.wrap_socket, tls_wrap_socket)
+        if hasattr(ssl, "wrap_socket"):
+            ssl.wrap_socket = monkey_patch(ssl.wrap_socket, tls_wrap_socket)
 
 
 ##[ Tests ]##################################################################

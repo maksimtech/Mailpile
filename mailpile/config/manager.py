@@ -1,6 +1,9 @@
 from __future__ import print_function
 import copy
-import cPickle
+try:
+    import cPickle
+except ImportError:
+    import pickle as cPickle
 import io
 import jinja2
 import json
@@ -12,11 +15,33 @@ import re
 import threading
 import fasteners
 import traceback
-import ConfigParser
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
+try:
+    import ConfigParser
+except ImportError:
+    import configparser as ConfigParser
 import errno
 
-from urllib import quote, unquote, getproxies
-from urlparse import urlparse
+try:
+    from urllib import quote, unquote, getproxies
+except ImportError:
+    from urllib.parse import quote, unquote
+    from urllib.request import getproxies
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 
 try:
     from appdirs import AppDirs
@@ -134,8 +159,8 @@ class ConfigManager(ConfigDict):
             cache_size=400,
             autoescape=True,
             trim_blocks=True,
-            extensions=['jinja2.ext.i18n', 'jinja2.ext.with_',
-                        'jinja2.ext.do', 'jinja2.ext.autoescape',
+            extensions=['jinja2.ext.i18n',
+                        'jinja2.ext.do', 
                         'mailpile.www.jinjaextensions.MailpileCommand']
         )
 
@@ -809,8 +834,8 @@ class ConfigManager(ConfigDict):
                            vfs.abspath(p))
         abs_paths = dict((_au(p), [p]) for p in paths)
         with self._lock:
-            for sid, src in self.sources.iteritems():
-                for mid, info in src.mailbox.iteritems():
+            for sid, src in self.sources.items():
+                for mid, info in src.mailbox.items():
                     umfn = _au(self.sys.mailbox[mid])
                     if umfn in abs_paths:
                         abs_paths[umfn].append((mid, src))
@@ -819,7 +844,7 @@ class ConfigManager(ConfigDict):
                         if lmfn in abs_paths:
                             abs_paths[lmfn].append((mid, src))
 
-            for mid, mfn in self.sys.mailbox.iteritems():
+            for mid, mfn in self.sys.mailbox.items():
                 umfn = _au(mfn)
                 if umfn in abs_paths:
                     if umfn[:4] == u'src:':
@@ -1247,7 +1272,7 @@ class ConfigManager(ConfigDict):
 
     def get_mail_source(config, src_id, start=False, changed=False):
         ms_thread = config.mail_sources.get(src_id)
-        if (ms_thread and not ms_thread.isAlive()):
+        if (ms_thread and not ms_thread.is_alive()):
             ms_thread = None
         if not ms_thread:
             from mailpile.mail_source import MailSource
@@ -1436,9 +1461,9 @@ class ConfigManager(ConfigDict):
                         config.background, job,
                         lambda: func(config.background))
                 return wrapped
-            for job, (i, f) in PluginManager.FAST_PERIODIC_JOBS.iteritems():
+            for job, (i, f) in PluginManager.FAST_PERIODIC_JOBS.items():
                 config.cron_worker.add_task(job, interval(i), wrap_fast(f))
-            for job, (i, f) in PluginManager.SLOW_PERIODIC_JOBS.iteritems():
+            for job, (i, f) in PluginManager.SLOW_PERIODIC_JOBS.items():
                 config.cron_worker.add_task(job, interval(i), wrap_slow(f))
 
     def _unlocked_get_all_workers(config):
@@ -1467,7 +1492,7 @@ class ConfigManager(ConfigDict):
 
         for wait in (False, True):
             for w in worker_list:
-                if w and w.isAlive():
+                if w and w.is_alive():
                     if config.sys.debug and wait:
                         print('Waiting for %s' % w)
                     w.quit(join=wait)

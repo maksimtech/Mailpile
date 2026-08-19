@@ -23,6 +23,18 @@
 #         IV logic and make sure it is still sane given the different
 #         properties of the underlying algorithms.
 #
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
 """
 Record-based AES encrypted data storage
 

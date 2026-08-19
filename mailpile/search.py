@@ -1,13 +1,31 @@
 from __future__ import print_function
-import cStringIO
+import io as cStringIO
 import email
 import random
 import re
-import rfc822
+try:
+    import rfc822
+except ImportError:
+    from email import utils as rfc822
 import time
 import threading
 import traceback
-from urllib import quote, unquote
+
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
+try:
+    from urllib import quote, unquote
+except ImportError:
+    from urllib.parse import quote, unquote
 
 import mailpile.util
 from mailpile.crypto.gpgi import GnuPG
@@ -82,7 +100,8 @@ class MailIndex(BaseIndex):
     # a mapping from unicode ordinals to either another unicode ordinal or
     # None, to remove a character. By default it removes the ASCII control
     # characters and replaces tabs and newlines with spaces.
-    NORM_TABLE = dict([(i, None) for i in range(0, 0x20)], **{
+    NORM_TABLE = {i: None for i in range(0, 0x20)}
+    NORM_TABLE.update({
         ord(u'\t'): ord(u' '),
         ord(u'\r'): ord(u' '),
         ord(u'\n'): ord(u' '),
@@ -613,12 +632,12 @@ class MailIndex(BaseIndex):
                              % (mailbox_idx, msg_mbox_idx))
         try:
             if msg_data:
-                msg_fd = cStringIO.StringIO(msg_data)
+                msg_fd = io.BytesIO(msg_data)
                 msg_metadata_kws = msg_metadata_kws or []
             elif lazy:
                 msg_data = mbox.get_bytes(msg_mbox_idx, 10240)
                 msg_data = msg_data.split('\r\n\r\n')[0].split('\n\n')[0]
-                msg_fd = cStringIO.StringIO(msg_data)
+                msg_fd = io.BytesIO(msg_data)
                 msg_bytes = mbox.get_msg_size(msg_mbox_idx)
                 msg_metadata_kws = mbox.get_metadata_keywords(msg_mbox_idx)
             else:
@@ -1292,7 +1311,7 @@ class MailIndex(BaseIndex):
                 keywords.extend([t + ':att' for t
                                  in re.findall(WORD_REGEXP, att.lower())])
                 att_kws = []
-                for kw, ext_list in ATT_EXTS.iteritems():
+                for kw, ext_list in ATT_EXTS.items():
                     ext = att.lower().rsplit('.', 1)[-1]
                     if ext in ext_list:
                         keywords.append('%s:has' % kw)
@@ -1618,7 +1637,7 @@ class MailIndex(BaseIndex):
         GlobalPostingList.Append(session, 'deleted:is', [b36(msg_idx)])
 
     def update_msg_sorting(self, msg_idx, msg_info):
-        for order, sorter in self.SORT_ORDERS.iteritems():
+        for order, sorter in self.SORT_ORDERS.items():
             self.INDEX_SORT[order][msg_idx] = sorter(self, msg_info)
 
     def set_msg_at_idx_pos(self, msg_idx, msg_info, original_line=None):
@@ -2043,7 +2062,7 @@ class MailIndex(BaseIndex):
         self._sort_freshness_tags = [tag._key for tag in
                                      self.config.get_tags(type='unread')]
         self.INDEX_SORT = {}
-        for order, sorter in self.SORT_ORDERS.iteritems():
+        for order, sorter in self.SORT_ORDERS.items():
             self.INDEX_SORT[order] = []
 
     def sort_results(self, session, results, how):

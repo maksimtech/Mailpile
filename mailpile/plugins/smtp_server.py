@@ -192,7 +192,7 @@ class SMTPWorker(threading.Thread):
 
     def quit(self, join=True):
         self.quitting = True
-        if join and self.isAlive():
+        if join and self.is_alive():
             self.join()
 
 

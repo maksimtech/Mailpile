@@ -1,5 +1,11 @@
 # vim: set fileencoding=utf-8 :
 #
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 MBX_ID_LEN = 4  # 4x36 == 1.6 million mailboxes
 
 

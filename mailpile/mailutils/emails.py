@@ -15,7 +15,7 @@ import os
 import quopri
 import random
 import re
-import StringIO
+import io as StringIO
 import threading
 import traceback
 from email import encoders
@@ -26,7 +26,16 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from mailpile.util import *
 from platform import system
-from urllib import quote, unquote
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    from urllib import quote, unquote
+except ImportError:
+    from urllib.parse import quote, unquote
 from datetime import datetime, timedelta
 
 from mailpile.crypto.gpgi import GnuPG
@@ -1060,7 +1069,7 @@ class Email(object):
                 attributes['thumb'] = True
                 attributes['mimetype'] = 'image/jpeg'
                 attributes['disposition'] = 'inline'
-                thumb = StringIO.StringIO()
+                thumb = io.StringIO()
                 if thumbnail(payload, thumb, height=250):
                     attributes['length'] = thumb.tell()
                     filename, fd = session.ui.open_for_data(

@@ -10,6 +10,12 @@ from mailpile.util import dict_merge
 
 # Patch pgpdump so it stops crashing on weird public keys #####################
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 def monkey_patch_pgpdump():
     # Add Algorithm 22 to the lookup table
     pgpdump.packet.AlgoLookup.pub_algorithms[22] = 'EdDSA'

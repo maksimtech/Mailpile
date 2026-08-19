@@ -51,10 +51,25 @@ import traceback
 import time
 from imaplib import IMAP4_SSL, CRLF
 from mailbox import Mailbox, Message
-from urllib import quote, unquote
+
 
 try:
-    import cStringIO as StringIO
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
+try:
+    from urllib import quote, unquote
+except ImportError:
+    from urllib.parse import quote, unquote
+
+try:
+    from io import StringIO
 except ImportError:
     import StringIO
 
@@ -517,7 +532,7 @@ class SharedImapMailbox(Mailbox):
 
     def get_file(self, key):
         info, payload = self.get(key)
-        return StringIO.StringIO(payload)
+        return io.StringIO(payload)
 
     def iterkeys(self):
         self._broken = None
@@ -531,7 +546,7 @@ class SharedImapMailbox(Mailbox):
                 for k in sorted(data))
 
     def keys(self):
-        return list(self.iterkeys())
+        return list(self.keys())
 
     def update_toc(self):
         self._last_updated = time.time()
@@ -1015,7 +1030,7 @@ class ImapMailSource(BaseMailSource):
             self.event.data['mailbox_state'] = {mbx._key: uvex}
 
     def _namespace_info(self, path):
-        for which, nslist in self.namespaces.iteritems():
+        for which, nslist in self.namespaces.items():
             for prefix, pathsep in nslist:
                 if path.startswith(prefix):
                     return prefix, pathsep or '/'
@@ -1197,7 +1212,7 @@ class _MockImap(object):
                 return rval
             return cmd
         for cmd, rval in dict_merge(self.DEFAULT_RESULTS, self.RESULTS
-                                    ).iteritems():
+                                    ).items():
             self.__setattr__(cmd, mkcmd(rval))
 
     def __getattr__(self, attr):
@@ -1257,7 +1272,7 @@ if __name__ == "__main__":
         with imap.open(throw=IMAP_IOError) as conn:
             print('%s' % (conn.list(), ))
         mbx = SharedImapMailbox(config, imap, mailbox_path='INBOX')
-        print('%s' % list(mbx.iterkeys()))
+        print('%s' % list(mbx.keys()))
         for key in args:
             info, payload = mbx.get(key)
             print('%s(%d bytes) = %s\n%s' % (mbx.get_msg_ptr('0000', key),

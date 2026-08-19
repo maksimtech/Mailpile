@@ -1,8 +1,20 @@
 from __future__ import print_function
 import cgi
 import time
-from urlparse import parse_qs, urlparse
-from urllib import quote, urlencode
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
+try:
+    from urlparse import parse_qs, urlparse
+except ImportError:
+    from urllib.parse import parse_qs, urlparse
+try:
+    from urllib import quote, urlencode
+except ImportError:
+    from urllib.parse import quote, urlencode
 
 import mailpile.auth
 import mailpile.security as security
@@ -76,7 +88,7 @@ class UrlMap:
 
     def _command(self, name,
                  args=None, query_data=None, post_data=None,
-                 method='GET', async=False):
+                 method='GET', is_async=False):
         """
         Return an instantiated mailpile.command object or raise a UsageError.
 
@@ -173,7 +185,7 @@ class UrlMap:
                     else:
                         data[var] = [d.decode('utf-8') for d in sdata]
 
-        return command(self.session, name, args, data=data, async=async)
+        return command(self.session, name, args, data=data, is_async=is_async)
 
     OUTPUT_SUFFIXES = ['.css', '.html', '.js',  '.json', '.rss', '.txt',
                        '.text', '.vcf', '.xml', '.csv',
@@ -293,7 +305,7 @@ class UrlMap:
         """RESERVED FOR LATER."""
 
     def _map_api_command(self, method, path_parts,
-                         query_data, post_data, fmt='html', async=False):
+                         query_data, post_data, fmt='html', is_async=False):
         """Map a path to a command list, prefering the longest match.
 
         >>> urlmap._map_api_command('GET', ['message', 'draft', ''], {}, {})
@@ -315,7 +327,7 @@ class UrlMap:
                                   query_data=query_data,
                                   post_data=post_data,
                                   method=method,
-                                  async=async)
+                                  is_async=is_async)
                 ]
             except UsageError:
                 pass
@@ -325,7 +337,7 @@ class UrlMap:
                                                        '/'.join(path_parts)))
 
     MAP_API = 'api'
-    MAP_ASYNC_API = 'async'
+    MAP_ASYNC_API = 'is_async'
     MAP_PATHS = {
         '': _map_root,
         'in': _map_tag,
@@ -353,8 +365,8 @@ class UrlMap:
             ...
         UsageError: Not available for GET: bogus
 
-        This is the async version of the API.
-        >>> urlmap.map(request, 'GET', '/async/0/search/', {}, {})
+        This is the is_async version of the API.
+        >>> urlmap.map(request, 'GET', '/is_async/0/search/', {}, {})
         [<mailpile.plugins.core.Output...>, <mailpile.plugins.search.Search...>]
 
         The root currently just redirects to /profiles/:
@@ -427,7 +439,7 @@ class UrlMap:
                 raise UsageError('Unknown API level: %s' % path_parts[2])
             return auth(self._map_api_command(method, path_parts[3:],
                                               query_data, post_data,
-                                              fmt='json', async=is_async),
+                                              fmt='json', is_async=is_async),
                         user_session)
 
         path_parts = path[1:].split('/')
@@ -472,7 +484,7 @@ class UrlMap:
         from mailpile.plugins.setup_magic import Setup
 
         if method.lower() == 'get':
-            qd = [(k, v) for k, vl in query_data.iteritems() for v in vl]
+            qd = [(k, v) for k, vl in query_data.items() for v in vl]
             if '_path' not in query_data:
                 qd.append(('_path', path))
         else:

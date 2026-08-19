@@ -10,6 +10,12 @@ from mailpile.crypto.autocrypt import AutocryptRecommendation
 from mailpile.mailutils.emails import Email
 
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 _plugins = PluginManager(builtin=__file__)
 
 
@@ -102,7 +108,7 @@ class CryptoPolicy(CryptoPolicyBaseAction):
         # Examine each one. The policy is to only attach a key if everyone
         # can use keys AND someone needs a key.
         needs_key = 0
-        for email, vc in who.iteritems():
+        for email, vc in who.items():
 
             if vc and vc.kind == 'profile':
                 continue  # Ignore self

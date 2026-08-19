@@ -26,6 +26,12 @@ from mailpile.vcard import AddressInfo
 from mailpile.plugins.search import Search, SearchResults, View
 
 
+
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3
+
 GLOBAL_EDITING_LOCK = MboxRLock()
 
 _plugins = PluginManager(builtin=__file__)
@@ -220,7 +226,7 @@ class CompositionCommand(AddComposeMethods(Search)):
                             if 'attachment' in self.data
                             else defaults.get('attachments', {}))
                 for att_id, att_fn in defaults.get('attachments',
-                                                   {}).iteritems():
+                                                   {}).items():
                     if att_id in att_keep:
                         fn = att_keep[att_id] or att_fn
                         up.append('Attachment-%s: %s' % (att_id, fn))

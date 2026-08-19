@@ -2,7 +2,10 @@ import os
 import json
 import sys
 from datetime import datetime as dtime
-from urllib2 import urlopen
+try:
+    from urllib2 import urlopen
+except ImportError:
+    from urllib.request import urlopen
 
 from mailpile.commands import Command
 from mailpile.config.base import PublicConfigRule as p

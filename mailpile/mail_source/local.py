@@ -7,6 +7,12 @@ from mailpile.i18n import ngettext as _n
 from mailpile.vfs import FilePath
 
 
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
+
 class LocalMailSource(BaseMailSource):
     """
     This is a mail source that watches over one or more local mailboxes.

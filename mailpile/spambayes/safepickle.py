@@ -3,11 +3,20 @@
 from __future__ import print_function
 import sys
 import os
-from six.moves import cPickle as pickle
+try:
+    from six.moves import cPickle as pickle
+except ImportError:
+    import pickle
 
 import fasteners
 
 from mailpile.spambayes.Options import options
+
+
+try:
+    long
+except NameError:
+    long = int  # Python 3
 
 def pickle_read(filename):
     """Read pickle file contents with a lock."""

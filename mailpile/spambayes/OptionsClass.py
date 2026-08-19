@@ -82,7 +82,7 @@ import os
 import shutil
 from tempfile import TemporaryFile
 
-from six.moves import cStringIO as StringIO
+from io import StringIO
 from six.moves import range
 
 import re
@@ -555,7 +555,7 @@ class OptionsClass(object):
         not persist over sessions.
         '''
         self.restore_point = {}
-        for key, opt_obj in self._options.iteritems():
+        for key, opt_obj in self._options.items():
             self.restore_point[key] = opt_obj.get()
 
     def revert_to_restore_point(self):
@@ -566,7 +566,7 @@ class OptionsClass(object):
         effect.  If new options have been added since set_restore_point,
         their values are not effected.
         '''
-        for key, value in self.restore_point.iteritems():
+        for key, value in self.restore_point.items():
             self._options[key].set(value)
 
     def merge_files(self, file_list):
@@ -578,7 +578,10 @@ class OptionsClass(object):
         self.set(section, option, value)
 
     def merge_file(self, filename):
-        import ConfigParser
+        try:
+    import ConfigParser
+except ImportError:
+    import configparser as ConfigParser
         c = ConfigParser.ConfigParser()
         c.read(filename)
         for sect in c.sections():
