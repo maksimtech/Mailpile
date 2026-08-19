@@ -255,7 +255,7 @@ class Generator:
         if not isinstance(payload, basestring):
             raise TypeError('string payload expected: %s' % type(payload))
         if self._mangle_from_:
-            payload = fcre.sub('>From ', payload)
+            payload = fcre.sub(r'>From ', payload)
         self._fp.write(payload)
 
     # Default body handler
@@ -292,7 +292,7 @@ class Generator:
         # If there's a preamble, write it out, with a trailing CRLF
         if msg.preamble is not None:
             if self._mangle_from_:
-                preamble = fcre.sub('>From ', msg.preamble)
+                preamble = fcre.sub(r'>From ', msg.preamble)
             else:
                 preamble = msg.preamble
             print(preamble + self._NL, end='', file=self._fp)
@@ -314,7 +314,7 @@ class Generator:
         if msg.epilogue is not None:
             print(self._NL, end='', file=self._fp)
             if self._mangle_from_:
-                epilogue = fcre.sub('>From ', msg.epilogue)
+                epilogue = fcre.sub(r'>From ', msg.epilogue)
             else:
                 epilogue = msg.epilogue
             self._fp.write(epilogue)
@@ -448,7 +448,7 @@ def _make_boundary(text=None):
     b = boundary
     counter = 0
     while True:
-        cre = re.compile('^--' + re.escape(b) + '(--)?$', re.MULTILINE)
+        cre = re.compile(r'^--' + re.escape(b) + '(--)?$', re.MULTILINE)
         if not cre.search(text):
             break
         b = boundary + '.' + str(counter)

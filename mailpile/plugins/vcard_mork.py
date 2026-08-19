@@ -79,7 +79,7 @@ class MorkImporter(VCardImporter):
     pCellText = re.compile(r'\^(.+?)=(.*)')
     pCellOid = re.compile(r'\^(.+?)\^(.+)')
     pCellEscape = re.compile(r'((?:\\[\$\0abtnvfr])|(?:\$..))')
-    pMindyEscape = re.compile('([\x00-\x1f\x80-\xff\\\\])')
+    pMindyEscape = re.compile(r'([\x00-\x1f\x80-\xff\\\\])')
 
     def escapeMindy(self, match):
         s = match.group()
@@ -178,7 +178,7 @@ class MorkImporter(VCardImporter):
 
     def inputMork(self, data):
         # Remove beginning comment
-        pComment = re.compile('//.*')
+        pComment = re.compile(r'//.*')
         data = pComment.sub('', data, 1)
 
         # Remove line continuation backslashes

@@ -1526,7 +1526,7 @@ class MailIndex(BaseIndex):
         '|\n>[^\n]*'                                      # Quoted content
         '|\n--[^\n]+BEGIN PGP[^\n]+--\s+(\S+:[^\n]+\n)*'  # PGP header
         ')+')
-    SNIPPET_SPACE_RE = re.compile('\s+')
+    SNIPPET_SPACE_RE = re.compile(r'\s+')
 
     @classmethod
     def clean_snippet(self, snippet):
@@ -1889,7 +1889,7 @@ class MailIndex(BaseIndex):
                     try:
                         return [int(h, 36) for h in gpl_hits]
                     except ValueError:
-                        b36re = re.compile('^[a-zA-Z0-9]{1,8}$')
+                        b36re = re.compile(r'^[a-zA-Z0-9]{1,8}$')
                         print('FIXME! BAD HITS: %s => %s' % (term, [
                             h for h in gpl_hits if not b36re.match(h)]))
                         return [int(h, 36) for h in gpl_hits if b36re.match(h)]

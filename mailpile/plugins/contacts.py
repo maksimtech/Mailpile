@@ -56,7 +56,7 @@ class VCardCommand(Command):
 
         def _vcards_as_text(self, result):
             lines = []
-            b64re = re.compile('base64,.*$')
+            b64re = re.compile(r'base64,.*$')
             for card in result:
                 if isinstance(card, list):
                     for line in card:

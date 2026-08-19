@@ -44,7 +44,7 @@ class SearchResults(dict):
     _NAME_TITLES = ('the', 'mr', 'ms', 'mrs', 'sir', 'dr', 'lord')
 
     def _name(self, sender, short=True, full_email=False):
-        words = re.sub('["<>]', '', sender).split()
+        words = re.sub(r'["<>]', '', sender).split()
         nomail = [w for w in words if not '@' in w]
         if nomail:
             if short:
@@ -76,11 +76,11 @@ class SearchResults(dict):
     def _compact(self, namelist, maxlen):
         l = len(namelist)
         while l > maxlen:
-            namelist = re.sub(', *[^, \.]+, *', ',,', namelist, 1)
+            namelist = re.sub(r', *[^, \.]+, *', ',,', namelist, 1)
             if l == len(namelist):
                 break
             l = len(namelist)
-        namelist = re.sub(',,,+, *', ' .. ', namelist, 1)
+        namelist = re.sub(r',,,+, *', ' .. ', namelist, 1)
         return namelist
 
     TAG_TYPE_FLAG_MAP = {
@@ -662,7 +662,7 @@ class SearchResults(dict):
                 if pos < len(thread):
                     from_info = '%s>%s' % (from_info[:20], gg(len(thread)-pos))
 
-            subject = re.sub('^(\\[[^\\]]{6})[^\\]]{3,}\\]\\s*', '\\1..] ',
+            subject = re.sub(r'^(\\[[^\\]]{6})[^\\]]{3,}\\]\\s*', '\\1..] ',
                              JE._nice_subject(m.get('subject')))
             subject_width = max(1, s_width - (clen + len(msg_meta)))
             subject = self._fix_width(subject, subject_width)

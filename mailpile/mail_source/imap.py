@@ -94,7 +94,7 @@ from mailpile.vfs import FilePath
 imaplib._MAXLINE = 10 * 1024 * 1024
 
 
-IMAP_TOKEN = re.compile('("[^"]*"'
+IMAP_TOKEN = re.compile(r'("[^"]*"'
                         '|[\\(\\)]'
                         '|[^\\(\\)"\\s]+'
                         '|\\s+)')
@@ -736,11 +736,11 @@ def _connect_imap(session, settings, event,
                 # If the response contains any RFC5530 response code
                 # check for an RFC5530 auth error code, otherwise check for
                 # "password" (case independent) in the response string.
-                if (re.search('\[AUTHENTICATIONFAILED\]|'
+                if (re.search(r'\[AUTHENTICATIONFAILED\]|'
                                 '\[AUTHORIZATIONFAILED\]|'
                                 '\[EXPIRED\]',     error_str) or
-                        (not re.search('\[([a-zA-Z]*)\]', error_str) and
-                            re.search('(?i)password', error_str) ) ):
+                        (not re.search(r'\[([a-zA-Z]*)\]', error_str) and
+                            re.search(r'(?i)password', error_str) ) ):
                     error_type = auth_error_type
                     error_msg = auth_error_msg
                     

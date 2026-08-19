@@ -226,7 +226,7 @@ def WebRootCheck(path):
         ...
     ValueError: Invalid web root: /foo/$%!
     """
-    p = re.sub('/+', '/', '/%s/' % path)[:-1]
+    p = re.sub(r'/+', '/', '/%s/' % path)[:-1]
     if (p != CleanText(p, banned=CleanText.NONPATH).clean):
         raise ValueError('Invalid web root: %s' % path)
     return p

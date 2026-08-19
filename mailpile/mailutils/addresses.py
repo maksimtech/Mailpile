@@ -106,13 +106,13 @@ class AddressHeaderParser(list):
     # Escaping and quoting
     TXT_RE_QUOTE = '=\\?([^\\?\\s]+)\\?([QqBb])\\?([^\\?\\s]*)\\?='
     TXT_RE_QUOTE_NG = TXT_RE_QUOTE.replace('(', '(?:')
-    RE_ESCAPES = re.compile('\\\\([\\\\"\'])')
+    RE_ESCAPES = re.compile(r'\\\\([\\\\"\'])')
     RE_QUOTED = re.compile(TXT_RE_QUOTE)
-    RE_SHOULD_ESCAPE = re.compile('([\\\\"\'])')
-    RE_SHOULD_QUOTE = re.compile('[^a-zA-Z0-9()\.:/_ \'"+@-]')
+    RE_SHOULD_ESCAPE = re.compile(r'([\\\\"\'])')
+    RE_SHOULD_QUOTE = re.compile(r'[^a-zA-Z0-9()\.:/_ \'"+@-]')
 
     # This is how we normally break a header line into tokens
-    RE_TOKENIZER = re.compile('(<[^<>]*>'                    # <stuff>
+    RE_TOKENIZER = re.compile(r'(<[^<>]*>'                    # <stuff>
                               '|\\([^\\(\\)]*\\)'            # (stuff)
                               '|\\[[^\\[\\]]*\\]'            # [stuff]
                               '|"(?:\\\\\\\\|\\\\"|[^"])*"'  # "stuff"
@@ -125,20 +125,20 @@ class AddressHeaderParser(list):
                               ')')
 
     # Where to insert spaces to help the tokenizer parse bad data
-    RE_MUNGE_TOKENSPACERS = (re.compile('(\S)(<)'), re.compile('(\S)(=\\?)'))
+    RE_MUNGE_TOKENSPACERS = (re.compile(r'(\S)(<)'), re.compile(r'(\S)(=\\?)'))
 
     # Characters to strip aware entirely when tokenizing munged data
-    RE_MUNGE_TOKENSTRIPPERS = (re.compile('[<>"]'),)
+    RE_MUNGE_TOKENSTRIPPERS = (re.compile(r'[<>"]'),)
 
     # This is stuff we ignore (undisclosed-recipients, etc)
-    RE_IGNORED_GROUP_TOKENS = re.compile('(?i)undisclosed')
+    RE_IGNORED_GROUP_TOKENS = re.compile(r'(?i)undisclosed')
 
     # Things we strip out to try and un-mangle e-mail addresses when
     # working with bad data.
-    RE_MUNGE_STRIP = re.compile('(?i)(?:\\bmailto:|[\\s"\']|\?$)')
+    RE_MUNGE_STRIP = re.compile(r'(?i)(?:\\bmailto:|[\\s"\']|\?$)')
 
     # This a simple regular expression for detecting e-mail addresses.
-    RE_MAYBE_EMAIL = re.compile('^[^()<>@,;:\\\\"\\[\\]\\s\000-\031]+'
+    RE_MAYBE_EMAIL = re.compile(r'^[^()<>@,;:\\\\"\\[\\]\\s\000-\031]+'
                                 '@[a-zA-Z0-9_\\.-]+(?:#[A-Za-z0-9]+)?$')
 
     # We try and interpret non-ascii data as a particular charset, in

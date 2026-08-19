@@ -107,8 +107,8 @@ class HttpRequestHandler(SimpleXMLRPCRequestHandler):
     ])
 
     _ERROR_CONTEXT = {'lastq': '', 'csrf': '', 'path': ''},
-    _NEWLINE_RE = re.compile('[\r\n]+')
-    _HTML_RE = re.compile('[<>\'\"]+')
+    _NEWLINE_RE = re.compile(r'[\r\n]+')
+    _HTML_RE = re.compile(r'[<>\'\"]+')
 
     def assert_no_newline(self, data):
         if re.search(self._NEWLINE_RE, str(data) or '') is not None:

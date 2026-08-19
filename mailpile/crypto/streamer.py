@@ -59,14 +59,14 @@ PREFERRED_CIPHER = 'aes-128-ctr'
 LEN_MD5_SUM = len(hashlib.md5(b'testing').hexdigest())
 MD5_SUM_FORMAT = 'md5sum: %s'
 MD5_SUM_PLACEHOLDER = MD5_SUM_FORMAT % ('0' * LEN_MD5_SUM)
-MD5_SUM_RE = re.compile('(?m)^' + MD5_SUM_FORMAT % (r'[^\n]+',))
+MD5_SUM_RE = re.compile(r'(?m)^' + MD5_SUM_FORMAT % (r'[^\n]+',))
 
 LEN_SHA_256 = len(hashlib.sha256(b'testing').hexdigest())
 SHA_256_FORMAT = 'sha256: %s'
 SHA_256_PLACEHOLDER = SHA_256_FORMAT % ('0' * LEN_SHA_256)
-SHA_256_RE = re.compile('(?m)^' + SHA_256_FORMAT % (r'[^\n]+',))
+SHA_256_RE = re.compile(r'(?m)^' + SHA_256_FORMAT % (r'[^\n]+',))
 
-BLANK_LINE_RE = re.compile('^\s*$')
+BLANK_LINE_RE = re.compile(r'^\s*$')
 
 
 # This gets populated with all the obsolete data we see during

@@ -860,7 +860,7 @@ for _i in xrange(1, 128):
     if chr(_i) not in ['"', '\\', '\n', '\r']:
         IMAP_ASTRING.append(chr(_i))
 del _i
-IMAP_ASTRING = r"\"?[" + re.escape(''.join(IMAP_ASTRING)) + r"]+\"?"
+IMAP_ASTRING = r"\"?[" + re.escape(r''.join(IMAP_ASTRING)) + r"]+\"?"
 
 # Similarly, each option must specify whether it should be reset to
 # this value on a "reset to defaults" command.  Most should, but with some

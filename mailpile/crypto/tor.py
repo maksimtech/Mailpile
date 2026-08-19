@@ -154,7 +154,7 @@ class Tor(threading.Thread):
                 str(self.control_password)],
                 stdout=subprocess.PIPE, bufsize=1)
             hasher.wait()
-            expr = re.compile('([\d]{2}:[\w]{58})')
+            expr = re.compile(r'([\d]{2}:[\w]{58})')
             match = filter(None, map(expr.match, hasher.stdout))[0]
             passhash = match.group(1)
             return passhash

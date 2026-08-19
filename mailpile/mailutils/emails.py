@@ -176,10 +176,10 @@ def GetTextPayload(part):
 
 def ExtractEmails(string, strip_keys=True):
     emails = []
-    startcrap = re.compile('^[\'\"<(]')
-    endcrap = re.compile('[\'\">);]$')
+    startcrap = re.compile(r'^[\'\"<(]')
+    endcrap = re.compile(r'[\'\">);]$')
     string = string.replace('<', ' <').replace('(', ' (')
-    for w in [sw.strip() for sw in re.compile('[,\s]+').split(string)]:
+    for w in [sw.strip() for sw in re.compile(r'[,\s]+').split(string)]:
         atpos = w.find('@')
         if atpos >= 0:
             while startcrap.search(w):
@@ -1351,9 +1351,9 @@ class Email(object):
             clines.append(line)
         return parse
 
-    BARE_QUOTE_STARTS = re.compile('(?i)^-+\s*Original Message.*-+$')
-    GIT_DIFF_STARTS = re.compile('^diff --git a/.*b/')
-    GIT_DIFF_LINE = re.compile('^([ +@-]|index |$)')
+    BARE_QUOTE_STARTS = re.compile(r'(?i)^-+\s*Original Message.*-+$')
+    GIT_DIFF_STARTS = re.compile(r'^diff --git a/.*b/')
+    GIT_DIFF_LINE = re.compile(r'^([ +@-]|index |$)')
 
     def parse_line_type(self, line, block, line_count):
         # FIXME: Detect forwarded messages, ...

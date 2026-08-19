@@ -141,7 +141,7 @@ class ANSIColors(NoColors):
     CURSOR_RESTORE = "\x1B[u"
     CLEAR_LINE = "\x1B[2K"
 
-    ANY_CODE = re.compile('\001|\x1B\[(0m|1[AB]|[su]|2K|[\d;]+?m|002)')
+    ANY_CODE = re.compile(r'\001|\x1B\[(0m|1[AB]|[su]|2K|[\d;]+?m|002)')
 
     def __init__(self):
         NoColors.__init__(self)

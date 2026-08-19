@@ -295,10 +295,10 @@ class MailpileCommand(Extension):
             '^.*?by (\S+?) [^;]*;\s+([A-Za-z]{3,3}, +\d+ +\S+ \d\d\d\d \d+:\d+:\d+(?: +[+-]\d\d\d\d)?)',
             data)
         if match:
-            return re.sub('\s+', ' ', ('%s (%s)' % (match.group(2), match.group(1))))
-        match = re.search('^.*([A-Za-z]{3,3}, +\d+ +\S+ +20\d\d \d+:\d+:\d+(?: +[+-]\d\d\d\d)?)', data)
+            return re.sub(r'\s+', ' ', ('%s (%s)' % (match.group(2), match.group(1))))
+        match = re.search(r'^.*([A-Za-z]{3,3}, +\d+ +\S+ +20\d\d \d+:\d+:\d+(?: +[+-]\d\d\d\d)?)', data)
         if match:
-            return re.sub('\s+', ' ', (match.group(1)))
+            return re.sub(r'\s+', ' ', (match.group(1)))
         else:
             return data[:50] + ('...' if (len(data) > 50) else '')
 
@@ -683,7 +683,7 @@ class MailpileCommand(Extension):
     def _thread_upside_down(self, thread):
         return [(i, flip_unicode_boxes(a), c) for i, a, c in reversed(thread)]
 
-    URL_RE_HTTP = re.compile('(<a [^>]*?)'            # 1: <a
+    URL_RE_HTTP = re.compile(r'(<a [^>]*?)'            # 1: <a
                              '(href=["\'])'           # 2:    href="
                              '(https?:[^>]+)'         # 3:  URL!
                              '(["\'][^>]*>)'          # 4:          ">
@@ -692,9 +692,9 @@ class MailpileCommand(Extension):
 
     # We deliberately leave the https:// prefix on, because it is both
     # rare and worth drawing attention to.
-    URL_RE_HTTP_PROTO = re.compile('(?i)^https?://((w+\d*|[a-z]+\d+)\.)?')
+    URL_RE_HTTP_PROTO = re.compile(r'(?i)^https?://((w+\d*|[a-z]+\d+)\.)?')
 
-    URL_RE_MAILTO = re.compile('(<a [^>]*?)'          # 1: <a
+    URL_RE_MAILTO = re.compile(r'(<a [^>]*?)'          # 1: <a
                                '(href=["\']mailto:)'  # 2:    href="mailto:
                                '([^"]+)'              # 3:  Email address!
                                '(["\'][^>]*>)'        # 4:          ">
@@ -856,7 +856,7 @@ class MailpileCommand(Extension):
     @classmethod
     def _nice_subject(self, subject):
         if subject:
-            output = re.sub('(?i)^((re|fw|fwd|aw|wg):\s+)+', '', subject)
+            output = re.sub(r'(?i)^((re|fw|fwd|aw|wg):\s+)+', '', subject)
         else:
             output = '(' + _("No Subject") + ')'
         return output
@@ -864,7 +864,7 @@ class MailpileCommand(Extension):
     @classmethod
     def _bare_subject(self, subject):
         if subject:
-            output = re.sub('(?i)^((re|fw|fwd|aw|wg):\s+|\[\S+\]\s+)+', '', subject)
+            output = re.sub(r'(?i)^((re|fw|fwd|aw|wg):\s+|\[\S+\]\s+)+', '', subject)
         else:
             output = '(' + _("No Subject") + ')'
         return output
