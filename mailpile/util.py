@@ -6,8 +6,10 @@ from __future__ import print_function
 try:
     import cgi
 except ImportError:
-    import html as cgi
+    import html
     import urllib.parse
+    import types
+    cgi = types.ModuleType("cgi")
     cgi.escape = html.escape
     cgi.parse_qs = urllib.parse.parse_qs
 import copy
