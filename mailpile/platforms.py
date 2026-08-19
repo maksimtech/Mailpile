@@ -78,7 +78,8 @@ def DetectBinaries(
                         path = subprocess.check_output(['which',
                                                         BINARIES[binary]])
                         if path:
-                            BINARIES[binary] = path.strip()
+                            path = path.strip()
+                            BINARIES[binary] = path.decode('utf-8') if isinstance(path, bytes) else path
                     except (OSError, subprocess.CalledProcessError):
                         pass
             except (OSError, subprocess.CalledProcessError, mailpile.util.TimedOut):

@@ -3,7 +3,13 @@
 # Misc. utility functions for Mailpile.
 #
 from __future__ import print_function
-import cgi
+try:
+    import cgi
+except ImportError:
+    import html as cgi
+    import urllib.parse
+    cgi.escape = html.escape
+    cgi.parse_qs = urllib.parse.parse_qs
 import copy
 import ctypes
 import datetime
@@ -74,7 +80,7 @@ DEFAULT_PORT = 33411
 
 # Warning: this is duplicated in the javascript, grep for WORD_REGEXP
 #          to keep any changes in sync.
-WORD_REGEXP = re.compile('[^\s!@#$%^&*\(\)_+=\{\}\[\]'
+WORD_REGEXP = re.compile(r'[^\s!@#$%^&*\(\)_+=\{\}\[\]'
                          ':\"|;`\'\\\<\>\?,\.\/\-]{2,}')
 
 # These next two variables are important for reducing hot-spots in the
@@ -127,15 +133,15 @@ B64C_TRANSLATE = str.maketrans('/', '_')
 
 B64W_TRANSLATE = str.maketrans('/+', '_-')
 
-STRHASH_RE = re.compile('[^0-9a-z]+')
+STRHASH_RE = re.compile(r'[^0-9a-z]+')
 
-ALPHA_RE  = re.compile("\A[a-zA-Z]+\Z")
-EMAIL_RE = re.compile("\A.+@.+\Z")
-DNSNAME_RE = re.compile("\A([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,32}\Z")
+ALPHA_RE  = re.compile(r"\A[a-zA-Z]+\Z")
+EMAIL_RE = re.compile(r"\A.+@.+\Z")
+DNSNAME_RE = re.compile(r"\A([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,32}\Z")
 
 B36_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-RE_LONG_LINE_SPLITTER = re.compile('([^\n]{,72}) ')
+RE_LONG_LINE_SPLITTER = re.compile(r'([^\n]{,72}) ')
 
 # see: http://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
 # currently we just use common ones

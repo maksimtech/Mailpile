@@ -1,5 +1,11 @@
 from __future__ import print_function
-import cgi
+try:
+    import cgi
+except ImportError:
+    import html as cgi
+    import urllib.parse
+    cgi.escape = html.escape
+    cgi.parse_qs = urllib.parse.parse_qs
 import time
 
 try:

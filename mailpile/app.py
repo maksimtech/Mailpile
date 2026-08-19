@@ -99,12 +99,12 @@ def FriendlyPipeTransform(session, opt):
         if ' |' in opt:
             cmd, pipe = opt.split(' |', 1)
             opt = 'pipe %s -- %s' % (pipe.strip(), cmd.strip())
-        elif re.search(' >\S+$', opt):
+        elif re.search(r' >\S+$', opt):
             cmd, pipe = opt.rsplit(' >', 1)
             opt = 'pipe >%s -- %s' % (pipe, cmd.strip())
             opt = opt.replace('\\|', '|').replace('\\>', '>')
 
-        if re.search(' :(json|j?html|text|\S+.html(?:!\S+))$', opt):
+        if re.search(r' :(json|j?html|text|\S+.html(?:!\S+))$', opt):
             old_render_mode = session.ui.render_mode
             opt, session.ui.render_mode = opt.rsplit(' :', 1)
 
