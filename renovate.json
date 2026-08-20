@@ -30,8 +30,5 @@
         "major-update"
       ]
     }
-  ],
-  "schedule": [
-    "before 6am on Monday"
   ]
 }
