@@ -3,7 +3,7 @@
 #                                                                             #
 # Usage: cd .. && make dpkg                                                   #
 # ----------------------------------------------------------------------------#
-FROM debian:stretch
+FROM debian:trixie
 MAINTAINER Alexandre Viau <aviau@debian.org>
 
 # The big list below is a subset of what we get from mk-build-deps; manually
