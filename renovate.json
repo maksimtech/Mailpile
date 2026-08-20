@@ -3,6 +3,7 @@
   "extends": [
     "config:recommended"
   ],
+  "forkProcessing": "enabled",
   "schedule": [
     "before 6am on Monday"
   ],
