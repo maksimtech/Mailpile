@@ -33,5 +33,7 @@
         "major-update"
       ]
     }
-  ]
+  ],
+  "dryRun": null,
+  "mode": "enabled"
 }
