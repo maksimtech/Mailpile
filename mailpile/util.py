@@ -54,8 +54,21 @@ from mailpile.safe_popen import Popen, PIPE
 
 
 try:
-    import imgsize
-except:
+    import imagesize as imgsize
+    # Compatibility wrapper for imagesize API
+    class _ImgsizeCompat:
+        class UnknownSize(Exception):
+            pass
+        @staticmethod
+        def get_size(fp):
+            data = fp.read() if hasattr(fp, 'read') else fp
+            w, h = imagesize.get(io.BytesIO(data))
+            if w == -1:
+                raise _ImgsizeCompat.UnknownSize()
+            return (w, h)
+    import imagesize
+    imgsize = _ImgsizeCompat()
+except ImportError:
     imgsize = None
 
 try:
